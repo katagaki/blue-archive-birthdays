@@ -1,0 +1,581 @@
+/* ---- Design tokens ---- */
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --layer: #f4f4f4;
+  --layer-hover: #e8e8e8;
+  --layer-accent: #e0e0e0;
+  --field: #f4f4f4;
+  --border-subtle: #e0e0e0;
+  --border-strong: #8d8d8d;
+  --text-primary: #161616;
+  --text-secondary: #525252;
+  --text-placeholder: #a8a8a8;
+  --text-on-interactive: #ffffff;
+  --link: #0f62fe;
+  --interactive: #0f62fe;
+  --support-info: #0043ce;
+  --support-error: #da1e28;
+  --focus: #0f62fe;
+  --icon: #161616;
+
+  /* How much of a school's accent tints its event background. */
+  --tint: 14%;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+
+  /* ---- School accents (light) ---- */
+  --school-Millennium: #0f62fe;  /* blue */
+  --school-Trinity: #b28600;     /* yellow */
+  --school-Gehenna: #9f1853;     /* wine */
+  --school-WildHunt: #5a656c;    /* gunmetal (sampled) */
+  --school-Hyakkiyako: #8a3ffc;  /* purple */
+  --school-RedWinter: #da1e28;   /* red */
+  --school-Highlander: #6fa300;  /* lime */
+  --school-Abydos: #0088b3;      /* cyan */
+  --school-Shanhaijing: #8d8da0; /* violet gray (sampled) */
+  --school-Arius: #3d2d47;       /* deep purple (sampled) */
+  --school-Valkyrie: #4338ca;    /* indigo */
+  --school-SRT: #198038;         /* green */
+  --school-Tokiwadai: #0f9b8e;   /* teal (collab) */
+  --school-ETC: #0f9b8e;         /* teal (collab) */
+}
+
+/* The theme always follows the OS; there is no manual override. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: #161616;
+    --layer: #262626;
+    --layer-hover: #333333;
+    --layer-accent: #393939;
+    --field: #262626;
+    --border-subtle: #393939;
+    --border-strong: #6f6f6f;
+    --text-primary: #f4f4f4;
+    --text-secondary: #c6c6c6;
+    --text-placeholder: #6f6f6f;
+    --text-on-interactive: #161616;
+    --link: #78a9ff;
+    --interactive: #4589ff;
+    --support-info: #4589ff;
+    --support-error: #fa4d56;
+    --focus: #ffffff;
+    --icon: #f4f4f4;
+
+    --tint: 20%;
+
+    --school-Millennium: #78a9ff;
+    --school-Trinity: #f1c21b;
+    --school-Gehenna: #ff7eb6;
+    --school-WildHunt: #76858f;
+    --school-Hyakkiyako: #cba6ff;
+    --school-RedWinter: #fa4d56;
+    --school-Highlander: #b6e021;
+    --school-Abydos: #56d3f0;
+    --school-Shanhaijing: #c4c4da;
+    --school-Arius: #b493c9;
+    --school-Valkyrie: #8f8cf5;
+    --school-SRT: #42be65;
+    --school-Tokiwadai: #39c5bb;
+    --school-ETC: #39c5bb;
+  }
+}
+
+* { box-sizing: border-box; }
+svg { display: block; }
+
+/* App-like: no text selection, no blue tap flash, no pointer cursors. */
+html {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input, a, .day, .event { cursor: default; }
+
+/* The whole app fits the viewport; only inner lists scroll. */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.42857;
+  letter-spacing: 0.16px;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* ---- Header ---- */
+.header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+  padding: 0 0 0 16px;
+  background: #161616;
+  border-bottom: 1px solid #393939;
+  color: #f4f4f4;
+}
+.header__name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+.header__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Search sits in the top-right of the header on desktop. */
+.header__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+}
+.header__search svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  fill: #c6c6c6;
+  pointer-events: none;
+}
+.header__search input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 44px;
+  background: transparent;
+  border: 0;
+  color: #f4f4f4;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.16px;
+  /* The one place selection must still work. */
+  -webkit-user-select: text;
+  user-select: text;
+}
+.header__search input::placeholder { color: #8d8d8d; }
+.header__search input:hover { background: #353535; }
+.header__search input:focus {
+  background: #262626;
+  outline: 2px solid #ffffff;
+  outline-offset: -2px;
+}
+
+.header__action {
+  flex: none;
+  height: 48px;
+  line-height: 1;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  color: #f4f4f4;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.16px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.header__action:hover { background: #353535; }
+.header__action:focus-visible { outline: 2px solid #ffffff; outline-offset: -2px; }
+.header__action svg { fill: currentColor; flex: none; }
+.header__action--icon { width: 48px; padding: 0; justify-content: center; }
+/* The search button is mobile-only; the inline field is desktop-only. */
+.header__action--icon { display: none; }
+
+/* ---- Layout ---- */
+.content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1584px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.heading {
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.28572;
+  letter-spacing: 0;
+  margin: 0;
+}
+.heading .year {
+  color: var(--text-secondary);
+  margin-left: 8px;
+}
+.caption {
+  margin: 4px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.32px;
+  color: var(--text-secondary);
+}
+.toolbar__right {
+  margin-left: auto;
+  display: flex;
+  gap: 1px;
+  background: var(--border-subtle);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  height: 40px;
+  min-width: 40px;
+  line-height: 1;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  background: var(--layer);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.16px;
+  transition: background 70ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+.btn:hover { background: var(--layer-hover); }
+.btn svg { fill: currentColor; }
+
+/* ---- Calendar grid ---- */
+/* Fills the remaining height; the container background shows through the
+   1px gaps as cell borders. Row template is set from JS per month. */
+.calendar {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--border-subtle);
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+}
+.weekday {
+  background: var(--background);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.32px;
+  color: var(--text-secondary);
+}
+.weekday--sun { color: var(--support-error); }
+.weekday--sat { color: var(--support-info); }
+
+.day {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+.day--outside { background: var(--layer); }
+.day--outside .day__num { color: var(--text-placeholder); }
+.day__num {
+  flex: none;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16px;
+  color: var(--text-secondary);
+}
+.day--today .day__num {
+  background: var(--interactive);
+  color: var(--text-on-interactive);
+  padding: 1px 6px;
+  align-self: flex-start;
+  font-weight: 600;
+}
+.day--today { box-shadow: inset 0 0 0 2px var(--interactive); }
+
+/* ---- Event tags, colored by school ---- */
+.event {
+  flex: none;
+  display: block;
+  width: 100%;
+  --accent: var(--interactive);
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) var(--tint), var(--background));
+  color: var(--text-primary);
+  padding: 2px 6px;
+  font-size: 12px;
+  letter-spacing: 0.16px;
+  line-height: 1.33;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event--dim { opacity: 0.25; }
+
+.event--Millennium  { --accent: var(--school-Millennium); }
+.event--Trinity     { --accent: var(--school-Trinity); }
+.event--Gehenna     { --accent: var(--school-Gehenna); }
+.event--WildHunt    { --accent: var(--school-WildHunt); }
+.event--Hyakkiyako  { --accent: var(--school-Hyakkiyako); }
+.event--RedWinter   { --accent: var(--school-RedWinter); }
+.event--Highlander  { --accent: var(--school-Highlander); }
+.event--Abydos      { --accent: var(--school-Abydos); }
+.event--Shanhaijing { --accent: var(--school-Shanhaijing); }
+.event--Arius       { --accent: var(--school-Arius); }
+.event--Valkyrie    { --accent: var(--school-Valkyrie); }
+.event--SRT         { --accent: var(--school-SRT); }
+.event--Tokiwadai   { --accent: var(--school-Tokiwadai); }
+.event--ETC         { --accent: var(--school-ETC); }
+
+.day__more {
+  flex: none;
+  font-size: 11px;
+  letter-spacing: 0.16px;
+  color: var(--link);
+  padding: 1px 4px;
+  background: none;
+  border: 0;
+  text-align: left;
+  font-family: inherit;
+}
+.day__more:hover { text-decoration: underline; }
+
+/* ---- Mobile search view ---- */
+.search-view {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--background);
+  display: none;
+  flex-direction: column;
+}
+.search-view--open { display: flex; }
+.search-view__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  background: #161616;
+  border-bottom: 1px solid #393939;
+}
+.search-view__back {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  color: #f4f4f4;
+}
+.search-view__back svg { fill: currentColor; }
+.search-view__bar input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  background: transparent;
+  border: 0;
+  color: #f4f4f4;
+  font-family: inherit;
+  font-size: 16px; /* 16px keeps iOS from zooming on focus */
+  -webkit-user-select: text;
+  user-select: text;
+}
+.search-view__bar input::placeholder { color: #8d8d8d; }
+.search-view__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent, var(--interactive));
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 16px;
+  text-align: left;
+}
+.result:hover { background: var(--layer); }
+.result__date {
+  margin-left: auto;
+  flex: none;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+.result__school {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ---- Side panel ---- */
+.panel {
+  position: fixed;
+  top: 48px;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 100vw;
+  background: var(--layer);
+  border-left: 1px solid var(--border-subtle);
+  transform: translateX(100%);
+  transition: transform 240ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+}
+.panel--open { transform: translateX(0); }
+.panel__header {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.panel__title { font-size: 20px; font-weight: 400; margin: 0; }
+.panel__sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.32px;
+  color: var(--text-secondary);
+}
+.panel__close {
+  width: 40px;
+  height: 40px;
+  margin: -8px -8px 0 auto;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  color: var(--icon);
+}
+.panel__close:hover { background: var(--layer-hover); }
+.panel__close svg { fill: currentColor; }
+.panel__body { overflow-y: auto; padding: 8px 0 32px; }
+.item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent, var(--interactive));
+}
+.item__name { font-size: 16px; }
+.item__meta {
+  font-size: 12px;
+  letter-spacing: 0.32px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.empty {
+  padding: 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ---- Error notification ---- */
+.notification {
+  display: none;
+  flex: none;
+  border-left: 3px solid var(--support-error);
+  background: var(--layer);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.notification--show { display: block; }
+.notification__title { font-size: 14px; font-weight: 600; }
+.notification__body { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+.notification code {
+  background: var(--layer-accent);
+  padding: 1px 4px;
+}
+
+/* ---- Small screens ---- */
+@media (max-width: 672px) {
+  /* Full-bleed grid: the calendar runs edge to edge, chrome keeps its gutter. */
+  .content { padding: 12px 0 0; }
+  .toolbar,
+  .notification { margin-left: 16px; margin-right: 16px; }
+  .calendar { border-left: 0; border-right: 0; border-bottom: 0; }
+
+  .header { gap: 8px; padding-left: 12px; }
+  /* Swap the inline field for a button that opens the full-screen view. */
+  .header__search { display: none; }
+  .header__action--icon { display: flex; }
+  .header__action-label { display: none; }
+  .header__action { padding: 0; width: 48px; justify-content: center; }
+
+  .heading { font-size: 20px; }
+  .toolbar { gap: 8px; margin-bottom: 12px; }
+  .toolbar__right { margin-left: auto; }
+
+  .weekday {
+    padding: 6px 4px;
+    font-size: 11px;
+    letter-spacing: 0;
+    text-align: center;
+  }
+
+  .day { padding: 3px; gap: 2px; }
+  .day__num { font-size: 11px; letter-spacing: 0; }
+  .day--today .day__num { padding: 0 4px; }
+
+  /* Wrap instead of truncating — at this size an ellipsis would hide most
+     of the name, so let it run onto a second line. */
+  .event {
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    padding: 1px 3px;
+    border-left-width: 2px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .day__more { font-size: 10px; letter-spacing: 0; padding: 0 3px; }
+
+  .panel { width: 100%; }
+}
+
+@media (max-width: 400px) {
+  .header__name { font-size: 13px; }
+  .event { font-size: 9px; }
+  .weekday { font-size: 10px; }
+}
