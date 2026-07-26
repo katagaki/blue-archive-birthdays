@@ -374,11 +374,10 @@ Promise.all([
     byDay = indexEvents(parseICS(ics));
     render();
   })
-  .catch(err => {
+  .catch(() => {
     document.getElementById('notice').classList.add('notification--show');
-    document.getElementById('noticeBody').innerHTML =
-      err.message + ' — <code>file://</code> では fetch がブロックされます。' +
-      'プロジェクトのルートで <code>python3 -m http.server 8000</code> を実行し、' +
-      '<code>http://localhost:8000</code> を開いてください。';
+    document.getElementById('noticeReload').addEventListener('click', () => {
+      location.reload();
+    });
     render();
   });
