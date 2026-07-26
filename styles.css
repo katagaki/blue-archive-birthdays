@@ -215,7 +215,7 @@ body {
   width: 100%;
   max-width: 1584px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
 }
@@ -224,7 +224,7 @@ body {
   flex: none;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -287,7 +287,7 @@ body {
 .weekday {
   background: var(--background);
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.32px;
   color: var(--text-secondary);
@@ -310,7 +310,7 @@ body {
 .day--outside .day__num { color: var(--text-placeholder); }
 .day__num {
   flex: none;
-  font-size: 13px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.16px;
   color: var(--text-secondary);
@@ -334,12 +334,16 @@ body {
   background: color-mix(in srgb, var(--accent) var(--tint), var(--background));
   color: var(--text-primary);
   padding: 2px 6px;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.16px;
   line-height: 1.33;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* RTL flips which edge overflows, so a long name loses its start, not its
+     end — the given name identifies the character better than the surname. */
+  direction: rtl;
+  text-align: left;
 }
 .event--dim { opacity: 0.25; }
 
@@ -360,7 +364,7 @@ body {
 
 .day__more {
   flex: none;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16px;
   color: var(--link);
   padding: 1px 4px;
@@ -544,38 +548,34 @@ body {
   .header__action { padding: 0; width: 48px; justify-content: center; }
 
   .heading { font-size: 20px; }
-  .toolbar { gap: 8px; margin-bottom: 12px; }
+  .toolbar { align-items: center; gap: 8px; margin-bottom: 12px; }
   .toolbar__right { margin-left: auto; }
 
   .weekday {
     padding: 6px 4px;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0;
     text-align: center;
   }
 
   .day { padding: 3px; gap: 2px; }
-  .day__num { font-size: 11px; letter-spacing: 0; }
+  .day__num { font-size: 12px; letter-spacing: 0; }
   .day--today .day__num { padding: 0 4px; }
 
-  /* Wrap instead of truncating — at this size an ellipsis would hide most
-     of the name, so let it run onto a second line. */
   .event {
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.2;
     letter-spacing: 0;
     padding: 1px 3px;
     border-left-width: 2px;
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
-  .day__more { font-size: 10px; letter-spacing: 0; padding: 0 3px; }
+  .day__more { font-size: 11px; letter-spacing: 0; padding: 0 3px; }
 
   .panel { width: 100%; }
 }
 
 @media (max-width: 400px) {
   .header__name { font-size: 13px; }
-  .event { font-size: 9px; }
-  .weekday { font-size: 10px; }
+  .event { font-size: 10px; }
+  .weekday { font-size: 11px; }
 }
