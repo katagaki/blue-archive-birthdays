@@ -14,6 +14,7 @@ const SCHOOL_LABELS = {
   Arius: 'アリウス',
   Valkyrie: 'ヴァルキューレ',
   SRT: 'SRT',
+  Odyssey: 'オデュッセイア',
   Tokiwadai: '常盤台',
   ETC: 'その他'
 };
