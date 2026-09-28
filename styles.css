@@ -37,6 +37,7 @@
   --school-Arius: #3d2d47;       /* deep purple (sampled) */
   --school-Valkyrie: #4338ca;    /* indigo */
   --school-SRT: #198038;         /* green */
+  --school-Odyssey: #ba4e00;     /* orange */
   --school-Tokiwadai: #0f9b8e;   /* teal (collab) */
   --school-ETC: #0f9b8e;         /* teal (collab) */
 }
@@ -77,6 +78,7 @@
     --school-Arius: #b493c9;
     --school-Valkyrie: #8f8cf5;
     --school-SRT: #42be65;
+    --school-Odyssey: #ff832b;
     --school-Tokiwadai: #39c5bb;
     --school-ETC: #39c5bb;
   }
@@ -359,6 +361,7 @@ body {
 .event--Arius       { --accent: var(--school-Arius); }
 .event--Valkyrie    { --accent: var(--school-Valkyrie); }
 .event--SRT         { --accent: var(--school-SRT); }
+.event--Odyssey     { --accent: var(--school-Odyssey); }
 .event--Tokiwadai   { --accent: var(--school-Tokiwadai); }
 .event--ETC         { --accent: var(--school-ETC); }
 
