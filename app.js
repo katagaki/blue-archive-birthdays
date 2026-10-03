@@ -19,9 +19,10 @@ const SCHOOL_LABELS = {
   ETC: 'その他'
 };
 
+// Phones get the agenda list instead of the month grid (see styles.css).
 const mobileQuery = window.matchMedia('(max-width: 672px)');
-// Rows are sized to the viewport, so fewer tags fit on a phone.
-const maxVisible = () => (mobileQuery.matches ? 1 : 3);
+// Tags shown per grid cell before the rest move into the panel.
+const MAX_VISIBLE = 3;
 
 // Map of "MM-DD" -> [{ summary, name, school, ... }]
 let byDay = new Map();
@@ -134,7 +135,8 @@ function schoolClass(ev) {
 }
 
 /* ---- Rendering ---- */
-function render() {
+// focusDay (optional) scrolls the phone agenda to that day of the month.
+function render(focusDay) {
   const year = view.getFullYear();
   const month = view.getMonth();
   const today = new Date();
@@ -177,8 +179,7 @@ function render() {
     num.textContent = String(date.getDate()).padStart(2, '0');
     cell.appendChild(num);
 
-    const limit = maxVisible();
-    events.slice(0, limit).forEach(ev => {
+    events.slice(0, MAX_VISIBLE).forEach(ev => {
       const tag = document.createElement('div');
       tag.className = 'event' + schoolClass(ev) + (matchesQuery(ev) ? '' : ' event--dim');
       tag.textContent = ev.name || ev.summary;
@@ -187,10 +188,10 @@ function render() {
     });
 
     // Hidden events are only reachable through the panel.
-    if (events.length > limit) {
+    if (events.length > MAX_VISIBLE) {
       const more = document.createElement('button');
       more.className = 'day__more';
-      more.textContent = '他 ' + (events.length - limit) + ' 件';
+      more.textContent = '他 ' + (events.length - MAX_VISIBLE) + ' 件';
       more.addEventListener('click', () => openPanel(date));
       cell.appendChild(more);
     }
@@ -198,9 +199,109 @@ function render() {
     cal.appendChild(cell);
   }
 
+  renderAgenda(year, month, today, focusDay);
+
   document.getElementById('monthCaption').textContent = query
     ? countMatches(year, month) + ' 件が「' + query + '」に一致 / 今月 ' + monthTotal + ' 件'
-    : monthTotal + ' 件の誕生日';
+    : '';
+}
+
+/* ---- Agenda list (phones) ---- */
+// One row per day with birthdays. Today always gets a row so the list
+// shows where "now" is, even on a day with nothing on it.
+function renderAgenda(year, month, today, focusDay) {
+  const list = document.getElementById('agenda');
+  list.textContent = '';
+  const days = new Date(year, month + 1, 0).getDate();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  let scrollTarget = null;
+
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(year, month, d);
+    const events = eventsFor(date);
+    const isToday = sameDay(date, today);
+    if (!events.length && !isToday) continue;
+
+    const cards = events.map(ev => {
+      const item = makeItem(ev);
+      if (!matchesQuery(ev)) item.classList.add('item--dim');
+      return item;
+    });
+    const row = dayRow(date, isToday, cards);
+    list.appendChild(row);
+
+    if (focusDay) {
+      if (d === focusDay) scrollTarget = row;
+    } else if (!scrollTarget && date >= startOfToday &&
+               year === today.getFullYear() && month === today.getMonth()) {
+      // In the current month, start the list at today (or the next birthday).
+      scrollTarget = row;
+    }
+  }
+
+  if (!list.children.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = '今月の誕生日はありません。';
+    list.appendChild(empty);
+  }
+
+  list.scrollTop = 0;
+  if (scrollTarget) {
+    list.scrollTop = scrollTarget.getBoundingClientRect().top - list.getBoundingClientRect().top;
+    // Briefly mark the day a search result jumped to.
+    if (focusDay) scrollTarget.classList.add('agenda__day--flash');
+  }
+}
+
+// A date column (number + weekday) beside a stack of cards. Shared by the
+// agenda and the search results so both lists read the same way.
+function dayRow(date, isToday, cards) {
+  const row = document.createElement('section');
+  const dow = date.getDay();
+  row.className = 'agenda__day' +
+    (isToday ? ' agenda__day--today' : '') +
+    (dow === 0 ? ' agenda__day--sun' : dow === 6 ? ' agenda__day--sat' : '');
+
+  const head = document.createElement('div');
+  head.className = 'agenda__date';
+  const num = document.createElement('span');
+  num.className = 'agenda__num';
+  num.textContent = String(date.getDate()).padStart(2, '0');
+  const wd = document.createElement('span');
+  wd.className = 'agenda__weekday';
+  wd.textContent = isToday ? '今日' : WEEKDAYS[dow];
+  head.appendChild(num);
+  head.appendChild(wd);
+  row.appendChild(head);
+
+  const items = document.createElement('div');
+  items.className = 'agenda__items';
+  if (!cards.length) {
+    const empty = document.createElement('div');
+    empty.className = 'agenda__none';
+    empty.textContent = '誕生日はありません';
+    items.appendChild(empty);
+  }
+  cards.forEach(card => items.appendChild(card));
+  row.appendChild(items);
+  return row;
+}
+
+function makeItem(ev, tag) {
+  const item = document.createElement(tag || 'div');
+  item.className = 'item';
+  if (ev.school) item.style.setProperty('--accent', 'var(--school-' + ev.school + ')');
+  const name = document.createElement('div');
+  name.className = 'item__name';
+  name.textContent = ev.name || ev.summary;
+  const meta = document.createElement('div');
+  meta.className = 'item__meta';
+  meta.textContent = (ev.school ? (SCHOOL_LABELS[ev.school] || ev.school) + ' · ' : '') +
+    (ev.yearly ? '毎年' : ev.year + '年');
+  item.appendChild(name);
+  item.appendChild(meta);
+  return item;
 }
 
 /* ---- Side panel (overflow days only) ---- */
@@ -220,21 +321,7 @@ function openPanel(date) {
     empty.textContent = 'この日の誕生日はありません。';
     body.appendChild(empty);
   }
-  events.forEach(ev => {
-    const item = document.createElement('div');
-    item.className = 'item';
-    if (ev.school) item.style.setProperty('--accent', 'var(--school-' + ev.school + ')');
-    const name = document.createElement('div');
-    name.className = 'item__name';
-    name.textContent = ev.name || ev.summary;
-    const meta = document.createElement('div');
-    meta.className = 'item__meta';
-    meta.textContent = (ev.school ? (SCHOOL_LABELS[ev.school] || ev.school) + ' · ' : '') +
-      (ev.yearly ? '毎年' : ev.year + '年');
-    item.appendChild(name);
-    item.appendChild(meta);
-    body.appendChild(item);
-  });
+  events.forEach(ev => body.appendChild(makeItem(ev)));
 
   panel.classList.add('panel--open');
   panel.setAttribute('aria-hidden', 'false');
@@ -251,77 +338,107 @@ function renderResults() {
   const body = document.getElementById('searchResults');
   body.textContent = '';
 
+  if (!query) {
+    body.appendChild(searchMessage('生徒名または学校名で検索できます'));
+    return;
+  }
+
   const all = [];
   for (const list of byDay.values()) {
     for (const ev of list) if (matchesQuery(ev)) all.push(ev);
   }
+  if (!all.length) {
+    body.appendChild(searchMessage('「' + query + '」に一致する生徒はいません'));
+    return;
+  }
   all.sort((a, b) => a.month - b.month || a.day - b.day || a.name.localeCompare(b.name, 'ja'));
 
-  if (!query) {
-    const empty = document.createElement('div');
-    empty.className = 'empty';
-    empty.textContent = '生徒名または学校名で検索します。';
-    body.appendChild(empty);
-    return;
+  const count = document.createElement('p');
+  count.className = 'search-view__count';
+  count.textContent = all.length + ' 人の生徒';
+  body.appendChild(count);
+
+  // Grouped by month, then by day, in the same rows as the agenda. Weekdays
+  // are for the year being viewed, which is where a tap jumps to.
+  const year = view.getFullYear();
+  const today = new Date();
+  const days = new Map(); // "M-D" -> events, in sorted order
+  for (const ev of all) {
+    const key = ev.month + '-' + ev.day;
+    if (!days.has(key)) days.set(key, []);
+    days.get(key).push(ev);
   }
-  if (!all.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty';
-    empty.textContent = '「' + query + '」に一致する生徒はいません。';
-    body.appendChild(empty);
-    return;
-  }
 
-  all.forEach(ev => {
-    const row = document.createElement('button');
-    row.className = 'result';
-    if (ev.school) row.style.setProperty('--accent', 'var(--school-' + ev.school + ')');
-
-    const text = document.createElement('span');
-    const name = document.createElement('span');
-    name.textContent = ev.name;
-    const school = document.createElement('span');
-    school.className = 'result__school';
-    school.textContent = ev.school ? (SCHOOL_LABELS[ev.school] || ev.school) : '';
-    text.appendChild(name);
-    text.appendChild(school);
-
-    const date = document.createElement('span');
-    date.className = 'result__date';
-    date.textContent = ev.month + '月' + ev.day + '日';
-
-    row.appendChild(text);
-    row.appendChild(date);
-    // Jump the calendar to that month and return to it.
-    row.addEventListener('click', () => {
-      view = new Date(view.getFullYear(), ev.month - 1, 1);
-      render();
-      closeSearch();
+  let group = null;
+  for (const events of days.values()) {
+    const { month, day } = events[0];
+    if (!group || group.month !== month) {
+      group = document.createElement('section');
+      group.className = 'search-group';
+      group.month = month;
+      const title = document.createElement('h2');
+      title.className = 'search-group__title';
+      title.textContent = MONTHS[month - 1];
+      group.appendChild(title);
+      body.appendChild(group);
+    }
+    const cards = events.map(ev => {
+      const card = makeItem(ev, 'button');
+      // Jump the agenda to that day and return to it.
+      card.addEventListener('click', () => {
+        view = new Date(year, month - 1, 1);
+        closeSearch();
+        render(day);
+      });
+      return card;
     });
-    body.appendChild(row);
-  });
+    const date = new Date(year, month - 1, day);
+    group.appendChild(dayRow(date, sameDay(date, today), cards));
+  }
+}
+
+function searchMessage(text) {
+  const el = document.createElement('div');
+  el.className = 'search-view__message';
+  el.innerHTML = '<svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true"><path d="M29 27.586l-7.552-7.552a11.018 11.018 0 10-1.414 1.414L27.586 29zM4 13a9 9 0 119 9 9.01 9.01 0 01-9-9z"/></svg>';
+  const p = document.createElement('p');
+  p.textContent = text;
+  el.appendChild(p);
+  return el;
 }
 
 function openSearch() {
   const v = document.getElementById('searchView');
   v.classList.add('search-view--open');
   v.setAttribute('aria-hidden', 'false');
+  v.inert = false;
   const input = document.getElementById('searchInput');
   input.value = query;
+  syncClear();
   renderResults();
   input.focus();
 }
 
 function closeSearch() {
   const v = document.getElementById('searchView');
+  if (!v.classList.contains('search-view--open')) return;
+  // Hand focus back before hiding, so it never sits inside a hidden view.
+  document.getElementById('searchOpen').focus();
   v.classList.remove('search-view--open');
   v.setAttribute('aria-hidden', 'true');
+  v.inert = true;
 }
 
 function setQuery(value) {
   query = value.trim().toLowerCase();
+  syncClear();
   render();
   renderResults();
+}
+
+// The clear button only shows while there is something to clear.
+function syncClear() {
+  document.getElementById('searchClear').hidden = !document.getElementById('searchInput').value;
 }
 
 /* ---- Wiring ---- */
@@ -354,8 +471,14 @@ mobileSearch.addEventListener('input', e => {
   desktopSearch.value = e.target.value;
   setQuery(e.target.value);
 });
+document.getElementById('searchClear').addEventListener('click', () => {
+  mobileSearch.value = desktopSearch.value = '';
+  setQuery('');
+  mobileSearch.focus();
+});
 
-// Re-render when crossing the breakpoint so the per-cell cap follows.
+// Re-render when crossing the breakpoint: the agenda can only scroll to today
+// once it is visible.
 mobileQuery.addEventListener('change', () => {
   closeSearch();
   render();

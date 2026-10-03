@@ -1,23 +1,42 @@
 /* ---- Design tokens ---- */
+/* Styled after the Blue Archive game UI: sky blue and white, slanted
+   parallelogram buttons, a yellow primary action, bold italic headings and
+   rounded white cards on a pale patterned background. */
 :root {
   color-scheme: light;
   --background: #ffffff;
-  --layer: #f4f4f4;
-  --layer-hover: #e8e8e8;
-  --layer-accent: #e0e0e0;
-  --field: #f4f4f4;
-  --border-subtle: #e0e0e0;
-  --border-strong: #8d8d8d;
-  --text-primary: #161616;
-  --text-secondary: #525252;
-  --text-placeholder: #a8a8a8;
+  --page-top: #f7fbff;
+  --page: #d9ecfb;
+  --layer: #f2f7fc;
+  --layer-hover: #e1eefa;
+  --layer-accent: #d6e8f8;
+  --field: #f2f7fc;
+  --border-subtle: #dbe7f2;
+  --border-strong: #a9c2da;
+  --text-primary: #2d4663;
+  --text-secondary: #5d7590;
+  --text-placeholder: #a7b8ca;
   --text-on-interactive: #ffffff;
-  --link: #0f62fe;
-  --interactive: #0f62fe;
-  --support-info: #0043ce;
-  --support-error: #da1e28;
-  --focus: #0f62fe;
-  --icon: #161616;
+  --link: #128cff;
+  --interactive: #128cff;
+  --interactive-light: #4cc3ff;
+  --primary: #ffe433;
+  --primary-hover: #fff07a;
+  --text-on-primary: #2d4663;
+  --support-info: #128cff;
+  --support-error: #f0476b;
+  --focus: #128cff;
+  --icon: #2d4663;
+
+  --chrome: #ffffff;
+  --chrome-text: #2d4663;
+  --chrome-hover: #e9f3fb;
+  --weekday-bg: #dcedfb;
+  --shadow: 0 2px 0 rgba(45, 70, 99, 0.12), 0 6px 18px rgba(45, 70, 99, 0.08);
+  --button-shadow: 0 2px 0 rgba(45, 70, 99, 0.18);
+  --radius: 10px;
+  --skew: -12deg;
+  --header-h: 56px;
 
   /* How much of a school's accent tints its event background. */
   --tint: 14%;
@@ -37,7 +56,6 @@
   --school-Arius: #3d2d47;       /* deep purple (sampled) */
   --school-Valkyrie: #4338ca;    /* indigo */
   --school-SRT: #198038;         /* green */
-  --school-Odyssey: #1192e8;     /* sky blue */
   --school-Tokiwadai: #0f9b8e;   /* teal (collab) */
   --school-ETC: #0f9b8e;         /* teal (collab) */
 }
@@ -46,23 +64,36 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --background: #161616;
-    --layer: #262626;
-    --layer-hover: #333333;
-    --layer-accent: #393939;
-    --field: #262626;
-    --border-subtle: #393939;
-    --border-strong: #6f6f6f;
-    --text-primary: #f4f4f4;
-    --text-secondary: #c6c6c6;
-    --text-placeholder: #6f6f6f;
-    --text-on-interactive: #161616;
-    --link: #78a9ff;
-    --interactive: #4589ff;
-    --support-info: #4589ff;
-    --support-error: #fa4d56;
-    --focus: #ffffff;
-    --icon: #f4f4f4;
+    --background: #15233a;
+    --page-top: #16273f;
+    --page: #0a1422;
+    --layer: #1b2c46;
+    --layer-hover: #233854;
+    --layer-accent: #2c4363;
+    --field: #1b2c46;
+    --border-subtle: #263b58;
+    --border-strong: #4b6587;
+    --text-primary: #eef5fc;
+    --text-secondary: #a8bdd4;
+    --text-placeholder: #5f7896;
+    --text-on-interactive: #ffffff;
+    --link: #6cc8ff;
+    --interactive: #1a8dff;
+    --interactive-light: #4cc3ff;
+    --primary: #ffe433;
+    --primary-hover: #fff07a;
+    --text-on-primary: #1d3047;
+    --support-info: #6cc8ff;
+    --support-error: #ff6f8e;
+    --focus: #6cc8ff;
+    --icon: #eef5fc;
+
+    --chrome: #15233a;
+    --chrome-text: #eef5fc;
+    --chrome-hover: #233854;
+    --weekday-bg: #1d3352;
+    --shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+    --button-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
 
     --tint: 20%;
 
@@ -78,7 +109,6 @@
     --school-Arius: #b493c9;
     --school-Valkyrie: #8f8cf5;
     --school-SRT: #42be65;
-    --school-Odyssey: #82cfff;
     --school-Tokiwadai: #39c5bb;
     --school-ETC: #39c5bb;
   }
@@ -101,7 +131,7 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  background: var(--background);
+  background: var(--page);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
@@ -109,39 +139,95 @@ html, body {
   letter-spacing: 0.16px;
   -webkit-font-smoothing: antialiased;
 }
+/* Soft vertical sky gradient behind the app. */
 body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(var(--page-top), var(--page));
 }
 
 :focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: -2px;
+  outline-offset: 2px;
+}
+
+/* ---- Slanted buttons ---- */
+/* The parallelogram is drawn by ::before so the label itself stays upright. */
+.btn,
+.header__action {
+  position: relative;
+  isolation: isolate;
+}
+.btn::before,
+.header__action::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: skewX(var(--skew));
+  border-radius: 4px;
+  transition: background 90ms ease-out, transform 90ms ease-out;
+}
+.btn:active::before,
+.header__action:active::before {
+  transform: skewX(var(--skew)) translateY(1px);
 }
 
 /* ---- Header ---- */
+/* Desktop: title | search | actions. The side columns share the leftover
+   width equally, so the search field sits at the true centre of the bar. */
 .header {
+  position: relative;
   flex: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, 360px) minmax(max-content, 1fr);
   align-items: center;
   gap: 16px;
-  height: 48px;
-  padding: 0 0 0 16px;
-  background: #161616;
-  border-bottom: 1px solid #393939;
-  color: #f4f4f4;
+  height: var(--header-h);
+  /* The bottom padding matches the accent stripe, so items centre in the
+     visible part of the bar rather than sitting low. */
+  padding: 0 20px 3px;
+  background: var(--chrome);
+  color: var(--chrome-text);
+  box-shadow: 0 2px 10px rgba(45, 70, 99, 0.1);
+  z-index: 10;
+}
+/* Blue accent stripe along the bottom edge. */
+.header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--interactive), var(--interactive-light) 60%, transparent);
 }
 .header__name {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
+/* Birthday cake mark. The viewBox starts 3 units down so the drawing
+   sits higher: its weight is in the cake, not the thin candle, so a
+   geometrically centred cake reads as low next to the title. */
+.header__mark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  overflow: visible;
+}
 .header__actions {
+  grid-column: 3;
   margin-left: auto;
   display: flex;
   align-items: center;
+  gap: 16px;
   height: 100%;
   min-width: 0;
   flex: 1;
@@ -150,63 +236,84 @@ body {
 
 /* Search sits in the top-right of the header on desktop. */
 .header__search {
+  grid-column: 2;
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 320px;
 }
 .header__search svg {
   position: absolute;
-  left: 16px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  fill: #c6c6c6;
+  fill: var(--text-secondary);
   pointer-events: none;
 }
 .header__search input {
   width: 100%;
-  height: 48px;
-  padding: 0 16px 0 44px;
-  background: transparent;
-  border: 0;
-  color: #f4f4f4;
+  height: 36px;
+  padding: 0 16px 0 40px;
+  background: var(--field);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--chrome-text);
   font-family: inherit;
   font-size: 14px;
   letter-spacing: 0.16px;
   /* The one place selection must still work. */
   -webkit-user-select: text;
   user-select: text;
+  transition: border-color 90ms ease-out, box-shadow 90ms ease-out;
 }
-.header__search input::placeholder { color: #8d8d8d; }
-.header__search input:hover { background: #353535; }
+.header__search input::placeholder { color: var(--text-placeholder); }
+.header__search input:hover { border-color: var(--border-strong); }
 .header__search input:focus {
-  background: #262626;
-  outline: 2px solid #ffffff;
-  outline-offset: -2px;
+  outline: none;
+  border-color: var(--interactive);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--interactive) 25%, transparent);
 }
 
 .header__action {
   flex: none;
-  height: 48px;
+  height: 38px;
   line-height: 1;
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   gap: 8px;
   background: transparent;
   border: 0;
-  color: #f4f4f4;
+  color: var(--text-on-primary);
   font-family: inherit;
   font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.16px;
   text-decoration: none;
   white-space: nowrap;
 }
-.header__action:hover { background: #353535; }
-.header__action:focus-visible { outline: 2px solid #ffffff; outline-offset: -2px; }
+/* The calendar download is the yellow primary action. */
+.header__action:not(.header__action--icon)::before {
+  background: var(--primary);
+  box-shadow: var(--button-shadow);
+}
+.header__action:not(.header__action--icon):hover::before { background: var(--primary-hover); }
 .header__action svg { fill: currentColor; flex: none; }
-.header__action--icon { width: 48px; padding: 0; justify-content: center; }
+.header__action--icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  color: var(--chrome-text);
+}
+/* Icon buttons (search, back) are always-visible slanted buttons, styled
+   like the month navigation buttons. */
+.header__action--icon::before {
+  background: var(--background);
+  box-shadow: inset 0 0 0 1px var(--border-subtle), var(--button-shadow);
+}
+.header__action--icon:hover::before { background: var(--layer-hover); }
 /* The search button is mobile-only; the inline field is desktop-only. */
 .header__action--icon { display: none; }
 
@@ -217,7 +324,7 @@ body {
   width: 100%;
   max-width: 1584px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
 }
@@ -226,53 +333,71 @@ body {
   flex: none;
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   margin-bottom: 16px;
 }
 .heading {
-  font-size: 28px;
-  font-weight: 400;
-  line-height: 1.28572;
-  letter-spacing: 0;
+  font-size: 32px;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
   margin: 0;
 }
 .heading .year {
-  color: var(--text-secondary);
-  margin-left: 8px;
+  color: var(--interactive);
+  margin-left: 10px;
+  font-size: 0.6em;
+  font-weight: 700;
 }
+/* Only shown while searching, for the match count. */
+.caption:empty { display: none; }
 .caption {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.32px;
   color: var(--text-secondary);
 }
 .toolbar__right {
   margin-left: auto;
   display: flex;
-  gap: 1px;
-  background: var(--border-subtle);
+  gap: 10px;
+  padding-right: 6px;
 }
 
 /* ---- Buttons ---- */
 .btn {
-  height: 40px;
-  min-width: 40px;
+  height: 38px;
+  min-width: 46px;
   line-height: 1;
-  padding: 0 15px;
+  padding: 0 18px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  border: 1px solid transparent;
-  background: var(--layer);
+  border: 0;
+  background: transparent;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.16px;
-  transition: background 70ms cubic-bezier(0, 0, 0.38, 0.9);
 }
-.btn:hover { background: var(--layer-hover); }
+.btn::before {
+  background: var(--background);
+  box-shadow: inset 0 0 0 1px var(--border-subtle), var(--button-shadow);
+}
+.btn:hover::before { background: var(--layer-hover); }
 .btn svg { fill: currentColor; }
+/* "Today" is the blue accent button. */
+#today { color: var(--text-on-interactive); }
+#today::before {
+  background: linear-gradient(var(--interactive-light), var(--interactive));
+  box-shadow: var(--button-shadow);
+}
+#today:hover::before { background: linear-gradient(#6fd0ff, #3a9fff); }
 
 /* ---- Calendar grid ---- */
 /* Fills the remaining height; the container background shows through the
@@ -280,19 +405,23 @@ body {
 .calendar {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
   background: var(--border-subtle);
+  box-shadow: var(--shadow);
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
 }
 .weekday {
-  background: var(--background);
-  padding: 8px 12px;
+  background: var(--weekday-bg);
+  padding: 7px 12px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
+  font-style: italic;
   letter-spacing: 0.32px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 .weekday--sun { color: var(--support-error); }
 .weekday--sat { color: var(--support-info); }
@@ -312,19 +441,34 @@ body {
 .day--outside .day__num { color: var(--text-placeholder); }
 .day__num {
   flex: none;
+  align-self: flex-start;
+  padding: 0 4px;
   font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.16px;
   color: var(--text-secondary);
 }
 .day--today .day__num {
-  background: var(--interactive);
+  position: relative;
+  isolation: isolate;
   color: var(--text-on-interactive);
-  padding: 1px 6px;
-  align-self: flex-start;
-  font-weight: 600;
+  padding: 1px 8px;
 }
-.day--today { box-shadow: inset 0 0 0 2px var(--interactive); }
+.day--today .day__num::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 3px;
+  transform: skewX(var(--skew));
+  background: linear-gradient(var(--interactive-light), var(--interactive));
+}
+.day--today {
+  background: color-mix(in srgb, var(--interactive) 6%, var(--background));
+  box-shadow: inset 0 0 0 2px var(--interactive);
+}
 
 /* ---- Event tags, colored by school ---- */
 .event {
@@ -332,11 +476,13 @@ body {
   display: block;
   width: 100%;
   --accent: var(--interactive);
-  border-left: 3px solid var(--accent);
+  border-left: 4px solid var(--accent);
+  border-radius: 2px 6px 6px 2px;
   background: color-mix(in srgb, var(--accent) var(--tint), var(--background));
   color: var(--text-primary);
   padding: 2px 6px;
   font-size: 13px;
+  font-weight: 600;
   letter-spacing: 0.16px;
   line-height: 1.33;
   white-space: nowrap;
@@ -361,153 +507,212 @@ body {
 .event--Arius       { --accent: var(--school-Arius); }
 .event--Valkyrie    { --accent: var(--school-Valkyrie); }
 .event--SRT         { --accent: var(--school-SRT); }
-.event--Odyssey     { --accent: var(--school-Odyssey); }
 .event--Tokiwadai   { --accent: var(--school-Tokiwadai); }
 .event--ETC         { --accent: var(--school-ETC); }
 
 .day__more {
   flex: none;
+  align-self: flex-start;
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.16px;
   color: var(--link);
-  padding: 1px 4px;
-  background: none;
+  padding: 1px 8px;
+  background: color-mix(in srgb, var(--interactive) 10%, var(--background));
   border: 0;
+  border-radius: 10px;
   text-align: left;
   font-family: inherit;
 }
-.day__more:hover { text-decoration: underline; }
+.day__more:hover { background: color-mix(in srgb, var(--interactive) 20%, var(--background)); }
 
 /* ---- Mobile search view ---- */
 .search-view {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: var(--background);
+  background: linear-gradient(var(--page-top), var(--page));
   display: none;
   flex-direction: column;
 }
 .search-view--open { display: flex; }
+/* Same chrome as the header, accent stripe included. */
 .search-view__bar {
+  position: relative;
   flex: none;
   display: flex;
   align-items: center;
-  height: 48px;
-  background: #161616;
-  border-bottom: 1px solid #393939;
+  height: var(--header-h);
+  padding: 0 12px 3px;
+  background: var(--chrome);
+  box-shadow: 0 2px 10px rgba(45, 70, 99, 0.1);
 }
-.search-view__back {
-  width: 48px;
-  height: 48px;
-  flex: none;
+.search-view__bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--interactive), var(--interactive-light) 60%, transparent);
+}
+.search-view__bar .header__action { margin-right: 10px; }
+
+.search-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.search-field > svg {
+  position: absolute;
+  left: 12px;
+  fill: var(--text-secondary);
+  pointer-events: none;
+}
+.search-field input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 40px 0 36px;
+  background: var(--field);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 16px; /* 16px keeps iOS from zooming on focus */
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.search-field input::-webkit-search-cancel-button { display: none; }
+.search-field input::placeholder { color: var(--text-placeholder); }
+.search-field input:focus {
+  outline: none;
+  border-color: var(--interactive);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--interactive) 25%, transparent);
+}
+.search-field__clear {
+  position: absolute;
+  right: 4px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   background: none;
   border: 0;
-  color: #f4f4f4;
+  border-radius: 6px;
+  color: var(--text-secondary);
 }
-.search-view__back svg { fill: currentColor; }
-.search-view__bar input {
-  flex: 1;
-  min-width: 0;
-  height: 48px;
-  padding: 0 16px;
-  background: transparent;
-  border: 0;
-  color: #f4f4f4;
-  font-family: inherit;
-  font-size: 16px; /* 16px keeps iOS from zooming on focus */
-  -webkit-user-select: text;
-  user-select: text;
-}
-.search-view__bar input::placeholder { color: #8d8d8d; }
+.search-field__clear[hidden] { display: none; }
+.search-field__clear svg { fill: currentColor; }
+
 .search-view__body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 32px;
 }
-.result {
+.search-view__count {
+  margin: 12px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.32px;
+  color: var(--text-secondary);
+}
+.search-group__title {
+  margin: 20px 0 2px;
+  font-size: 20px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+.search-group:first-of-type .search-group__title { margin-top: 8px; }
+/* Empty and no-match states, centred in the view. */
+.search-view__message {
+  padding: 72px 24px 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  padding: 12px 16px;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--accent, var(--interactive));
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 16px;
-  text-align: left;
-}
-.result:hover { background: var(--layer); }
-.result__date {
-  margin-left: auto;
-  flex: none;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
+  text-align: center;
   color: var(--text-secondary);
 }
-.result__school {
-  display: block;
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
+.search-view__message svg { fill: var(--border-strong); }
+.search-view__message p { margin: 0; font-size: 14px; font-weight: 600; }
 
 /* ---- Side panel ---- */
 .panel {
   position: fixed;
-  top: 48px;
-  right: 0;
-  bottom: 0;
+  top: calc(var(--header-h) + 12px);
+  right: 12px;
+  bottom: 12px;
   width: 360px;
-  max-width: 100vw;
-  background: var(--layer);
-  border-left: 1px solid var(--border-subtle);
-  transform: translateX(100%);
+  max-width: calc(100vw - 24px);
+  overflow: hidden;
+  background: var(--background);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 0 rgba(45, 70, 99, 0.15), 0 16px 40px rgba(45, 70, 99, 0.25);
+  transform: translateX(calc(100% + 24px));
   transition: transform 240ms cubic-bezier(0.2, 0, 0.38, 0.9);
   z-index: 30;
   display: flex;
   flex-direction: column;
 }
 .panel--open { transform: translateX(0); }
+/* Popup title bar: blue gradient with hatching, as on in-game windows. */
 .panel__header {
   display: flex;
   align-items: flex-start;
-  padding: 16px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 16px 14px 20px;
+  color: #ffffff;
+  background:
+    repeating-linear-gradient(-60deg, transparent 0 12px, rgba(255, 255, 255, 0.08) 12px 13px),
+    linear-gradient(100deg, var(--interactive), var(--interactive-light));
 }
-.panel__title { font-size: 20px; font-weight: 400; margin: 0; }
+.panel__title {
+  font-size: 22px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
 .panel__sub {
   margin: 2px 0 0;
   font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.32px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
 }
 .panel__close {
-  width: 40px;
-  height: 40px;
-  margin: -8px -8px 0 auto;
+  width: 36px;
+  height: 36px;
+  margin: -4px -4px 0 auto;
   display: grid;
   place-items: center;
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: 0;
-  color: var(--icon);
+  border-radius: 50%;
+  color: #ffffff;
 }
-.panel__close:hover { background: var(--layer-hover); }
+.panel__close:hover { background: rgba(255, 255, 255, 0.35); }
 .panel__close svg { fill: currentColor; }
-.panel__body { overflow-y: auto; padding: 8px 0 32px; }
+.panel__body { overflow-y: auto; padding: 12px 12px 32px; background: var(--layer); flex: 1; }
 .item {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--accent, var(--interactive));
+  margin-bottom: 8px;
+  background: var(--background);
+  border-left: 5px solid var(--accent, var(--interactive));
+  border-radius: 4px var(--radius) var(--radius) 4px;
+  box-shadow: var(--button-shadow);
 }
-.item__name { font-size: 16px; }
+.item__name { font-size: 16px; font-weight: 700; }
 .item__meta {
   font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.32px;
   color: var(--text-secondary);
   margin-top: 2px;
@@ -515,6 +720,7 @@ body {
 .empty {
   padding: 16px;
   font-size: 14px;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -522,63 +728,147 @@ body {
 .notification {
   display: none;
   flex: none;
-  border-left: 3px solid var(--support-error);
-  background: var(--layer);
+  border-left: 5px solid var(--support-error);
+  border-radius: 4px var(--radius) var(--radius) 4px;
+  background: var(--background);
+  box-shadow: var(--shadow);
   padding: 16px;
   margin-bottom: 16px;
 }
 .notification--show { display: block; }
-.notification__title { font-size: 14px; font-weight: 600; }
-.notification__body { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+.notification__title { font-size: 14px; font-weight: 800; }
+.notification__body { font-size: 14px; color: var(--text-secondary); margin-top: 8px; }
 .notification code {
   background: var(--layer-accent);
   padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* ---- Agenda list (phones only) ---- */
+.agenda { display: none; }
+.agenda__day {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+}
+.agenda__day + .agenda__day { border-top: 1px solid var(--border-subtle); }
+.agenda__date {
+  flex: none;
+  width: 44px;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-style: italic;
+  color: var(--text-primary);
+}
+.agenda__num {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.agenda__weekday {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.agenda__day--sun .agenda__weekday { color: var(--support-error); }
+.agenda__day--sat .agenda__weekday { color: var(--support-info); }
+/* Today's date sits in the same slanted blue badge as the grid. */
+.agenda__day--today .agenda__num {
+  position: relative;
+  isolation: isolate;
+  padding: 4px 6px;
+  color: var(--text-on-interactive);
+}
+.agenda__day--today .agenda__num::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 4px;
+  transform: skewX(var(--skew));
+  background: linear-gradient(var(--interactive-light), var(--interactive));
+}
+.agenda__day--today .agenda__weekday { color: var(--interactive); }
+.agenda__items {
+  flex: 1;
+  min-width: 0;
+}
+.agenda__items .item:last-child { margin-bottom: 0; }
+/* Cards take a tint of the student's school: mixed into the light card
+   background it's a lighter variant, into the navy one a darker variant. */
+.agenda .item,
+.search-view .item {
+  background: color-mix(in srgb, var(--accent, var(--interactive)) var(--tint), var(--background));
+}
+.agenda__none {
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-placeholder);
+}
+.item--dim { opacity: 0.35; }
+/* Search results are tappable cards. */
+button.item {
+  display: block;
+  width: 100%;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  color: var(--text-primary);
+  font-family: inherit;
+  text-align: left;
+}
+button.item:active { transform: translateY(1px); }
+/* The day a search result jumped to pulses once. */
+.agenda__day--flash .item { animation: flash 1.2s ease-out; }
+@keyframes flash {
+  0%, 30% { box-shadow: 0 0 0 3px var(--interactive); }
+  100% { box-shadow: var(--button-shadow); }
 }
 
 /* ---- Small screens ---- */
 @media (max-width: 672px) {
-  /* Full-bleed grid: the calendar runs edge to edge, chrome keeps its gutter. */
+  :root { --header-h: 52px; }
+
+  /* The month grid gives way to a scrolling agenda list. */
   .content { padding: 12px 0 0; }
   .toolbar,
   .notification { margin-left: 16px; margin-right: 16px; }
-  .calendar { border-left: 0; border-right: 0; border-bottom: 0; }
+  .calendar { display: none; }
+  .agenda {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 16px 24px;
+  }
 
-  .header { gap: 8px; padding-left: 12px; }
+  .header { display: flex; gap: 8px; padding: 0 4px 3px 14px; }
+  .header__name { font-size: 16px; gap: 8px; }
+  .header__mark { width: 24px; height: 24px; }
+  .header__actions { gap: 4px; }
   /* Swap the inline field for a button that opens the full-screen view. */
   .header__search { display: none; }
   .header__action--icon { display: flex; }
   .header__action-label { display: none; }
-  .header__action { padding: 0; width: 48px; justify-content: center; }
+  .header__action { padding: 0; width: 48px; height: 34px; justify-content: center; margin-right: 8px; }
 
-  .heading { font-size: 20px; }
-  .toolbar { align-items: center; gap: 8px; margin-bottom: 12px; }
-  .toolbar__right { margin-left: auto; }
-
-  .weekday {
-    padding: 6px 4px;
-    font-size: 12px;
-    letter-spacing: 0;
-    text-align: center;
-  }
-
-  .day { padding: 3px; gap: 2px; }
-  .day__num { font-size: 12px; letter-spacing: 0; }
-  .day--today .day__num { padding: 0 4px; }
-
-  .event {
-    font-size: 11px;
-    line-height: 1.2;
-    letter-spacing: 0;
-    padding: 1px 3px;
-    border-left-width: 2px;
-  }
-  .day__more { font-size: 11px; letter-spacing: 0; padding: 0 3px; }
-
-  .panel { width: 100%; }
+  .heading { font-size: 22px; }
+  /* One row: a long search caption truncates instead of pushing the
+     month buttons onto a second line. */
+  .toolbar { flex-wrap: nowrap; gap: 8px; margin-bottom: 4px; }
+  .toolbar > div:first-child { min-width: 0; }
+  .caption { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .toolbar__right { flex: none; }
+  .toolbar__right { margin-left: auto; gap: 8px; }
+  .btn { height: 34px; min-width: 40px; padding: 0 12px; }
 }
 
 @media (max-width: 400px) {
-  .header__name { font-size: 13px; }
-  .event { font-size: 10px; }
-  .weekday { font-size: 11px; }
+  .header__name { font-size: 14px; }
 }
